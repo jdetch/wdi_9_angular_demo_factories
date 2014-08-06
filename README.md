@@ -340,6 +340,64 @@ _This is implemented in tbe "services" branch._
 ```
 
 
+#### Defining Application Wide Variables.
+
+Provide variables that don't belong in a factory, service or controller. They are application wide variables that have values.
+
+##### Add app settings to the app/services/values.js
+
+```
+// Create applicaton wide settings
+angular.module("customersApp").value('appSettings', {
+  title: "Customers Application",
+  version: "1.0"
+});
+
+/*
+// Use constant if you need app wide values available inside the app config
+angular.module("customersApp").constant('appSettings', {
+  title: "Customers Application",
+  version: "1.0"
+});
+*/
+
+```
+
+##### Add the app settings to the $scope for the customers View, app/controllers/customersController.js .
+
+```
+(function customersControllerIIFE(){
+
+  // 1. Inject application wide value, appSetting.
+  var CustomersController = function($scope, customersFactory, appSettings){
+	...
+    // 2. Make the application wide settings available in the view.
+    $scope.appSettings = appSettings;
+
+	...
+
+  };
+
+ // 3. Prevent the minifier from breaking dependency injection.
+ CustomersController.$inject = ['$scope', 'customersFactory', 'appSettings'];
+ ...
+})();
+
+```
+
+##### Use the app settings in the customers View, app/views/customers.html.
+
+```
+ <h3>{{ appSettings.title}} </h3>
+...
+<span>Total customers: {{customers.length}}</span>
+<br/>
+<br/>
+<footer>Version: {{ appSettings.version }}</footer>
+
+```
+
+
 ## Documentation
 
 [AngularJS](https://angularjs.org/)
