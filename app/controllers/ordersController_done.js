@@ -8,7 +8,17 @@
 
     function init(){
       // Search for the customer by id
-      $scope.customer = customersFactory.getCustomer(customerId);
+      // $scope.customer = customersFactory.getCustomer(customerId);
+      customersFactory.getCustomer(customerId)
+        .success(function(customer){
+          $scope.customer = customer;
+        })
+        .error(function(data, status, headers, config){
+          console.log("Error getting a customer from the remote api");
+        alert();ert("Error getting a customer from the remote api");
+
+        });
+
     }
 
     init();
