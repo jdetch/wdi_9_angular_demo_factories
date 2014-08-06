@@ -263,6 +263,82 @@ Factories use the [Revealing Module Javascript Pattern](http://addyosmani.com/re
 <br/>
 ```
 
+#### Services (Optional)
+
+Services behave somewhat like Factories. They are both Singletons. __But, a Service doesn't use the Self Revealing Function pattern.__
+
+
+_This is implemented in tbe "services" branch._
+
+##### Create a app/services/customerService.js. (Only the changes from Factory are shown.)
+
+```
+(function customersServiceIIFE(){
+
+  // Create a customers service
+  var customersService = function(){
+    // customers is private, only available in this scope
+    var customers = [
+     ...
+         ]; // end of customers data
+
+    this.getCustomers = function(){
+      // allow access to the list of customers
+      return customers;
+    };
+
+    this.getCustomer = function(customerId){
+      for(var i=0, len=customers.length; i < len; i++){
+        if(customers[i].id == parseInt(customerId)){
+          return customers[i];
+        }
+      }
+      return {};
+    };
+  };
+
+  angular.module('customersApp').service('customersService', customersService);
+})();
+
+```
+
+* An Angular Service provides a function that gets injected into a controller. _Note: we are NOT using a Self Revealing Function here. We have remove one level of indirection_.
+* The methods of a Service are set on the Service Singleton's "this" pointer.
+* The Service is registered using the angular.module('appName').service(...) method.
+
+##### Change the customers controller to use a service instead of a factory. (Only the changes from Factory are shown.)
+
+```
+(function customersControllerIIFE(){
+
+  // 1. Inject the customersService into this controller
+  var CustomersController = function($scope, customersService){
+	 ...
+
+    function init(){
+      // Init the customers from the service
+      $scope.customers = customersService.getCustomers();
+    }
+	...
+
+  };
+
+ // Prevent the minifier from breaking dependency injection.
+ CustomersController.$inject = ['$scope', 'customersService'];
+
+ ...
+
+})();
+
+```
+
+##### Change the shell file, index.html, to use a service instead of a factory. (Only the changes from Factory are shown.)
+
+```
+ <!-- <script src='app/services/customersFactory_done.js'></script> -->
+ <script src='app/services/customersService_done.js'></script>
+```
+
 
 ## Documentation
 
