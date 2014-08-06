@@ -397,6 +397,115 @@ angular.module("customersApp").constant('appSettings', {
 
 ```
 
+## Ajax (finally)
+
+We are, finally, going to make remote API HTTP Request for the customer data. We will be using a very simple Rails app, actually created with the Rails API gem.
+
+The repo for this API is [Customers API](https://github.com/ga-wdi-boston/wdi_9_rails_customers_api). 
+
+
+But, we will need to setup the Angular Factories we created above to make Ajax calls to this API.
+
+##### Modify the app/services/customersFactory.js 
+
+```
+(function customersFactoryIIFE(){
+
+  // Create a customers factory
+  var customersFactory = function($http){
+    var factory = {};
+
+    factory.getCustomers = function(){
+      // allow access to the list of customers
+      return  $http.get('http://localhost:3000/customers');
+    };
+
+    factory.getCustomer = function(customerId){
+      return  $http.get('http://localhost:3000/customers/' + customerId);
+    };
+    return factory;
+  };
+
+  customersFactory.$inject = ['$http'];
+
+  angular.module('customersApp').factory('customersFactory', customersFactory);
+})();
+
+```
+
+* We've injected the Angular Ajax Service, __$http__ , in to this Factory. 
+	* The $http behaves very much like the jQuery $.ajax  
+* We have __FINALLY__ removed the hard coded customers data from our app. And now are making a remote API request for this data.  
+	``$http.get('http://localhost:3000/customers') ``  
+* And we are making a HTTP GET Request for a specific customers data.  
+	``$http.get('http://localhost:3000/customers/' + customerId) ``  
+* Doing the weasel work of preventing the javascript minification problems.  
+	``customersFactory.$inject = ['$http']; ``  
+
+Check out the $http Angular service. In each of the methods above we return a _Promise_ from the $http service. A Promise will be invoked when the Ajax asynchronous request is returned from the server.
+
+##### Modify the app/controllers/customersController.js
+
+```
+(function customersControllerIIFE(){
+
+  var CustomersController = function($scope, customersFactory, appSettings){
+
+	... 
+    function init(){
+      // Init the customers from the factory
+      //$scope.customers = customersFactory.getCustomers();
+      customersFactory.getCustomers()
+      .success(function(customers){
+        $scope.customers = customers;
+      })
+      .error(function(data, status, headers, config){
+        console.log("Error getting customers from the remote api");
+        alert("Error getting customers from the remote api");
+      });
+    }
+
+    init();
+    ...
+
+  };
+
+ ...
+
+})();
+
+```
+
+* We have changed the init function to handle the _Promise_ returned by the customersFactory.getCustomers method. 
+	* The anonymous function passed to success will fire and update the ViewModel's, $scope, with the customers data.
+	* The anonymous function passed to error will fire if there is an error communicating with the API.  
+
+#### Modify the app/controllers/ordersController.js
+
+```
+... 
+    function init(){
+      // Search for the customer by id
+      // $scope.customer = customersFactory.getCustomer(customerId);
+      customersFactory.getCustomer(customerId)
+        .success(function(customer){
+          $scope.customer = customer;
+        })
+        .error(function(data, status, headers, config){
+          console.log("Error getting a customer from the remote api");
+        alert();ert("Error getting a customer from the remote api");
+
+        });
+
+    }
+
+... 
+```
+
+* We have changed the init function to handle the _Promise_ returned by the customersFactory.getCustomer(customerID) method. 
+	* The anonymous function passed to success will fire and update the ViewModel's, $scope, with the customer data, $scope.customer.
+	* The anonymous function passed to error will fire if there is an error communicating with the API.
+
 
 ## Documentation
 
