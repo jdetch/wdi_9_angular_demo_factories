@@ -1,10 +1,7 @@
 (function customersFactoryIIFE(){
-  //create a customer Factory
 
-  // JavaScript scope for the IIFE
-
+  // Create a customers factory
   var customersFactory = function(){
-    // JavaScript scope for the customersFactory
     // customers is private, only available in this scope
     var customers = [
       {
@@ -70,7 +67,6 @@
       }
     ]; // end of customers data
 
-    // create a object literal
     var factory = {};
 
     factory.getCustomers = function(){
@@ -86,11 +82,8 @@
       }
       return {};
     };
-
-    // return the object literal we created above
     return factory;
-  }; // end of customersFactory
+  };
 
-  //Register this factory
   angular.module('customersApp').factory('customersFactory', customersFactory);
 })();
