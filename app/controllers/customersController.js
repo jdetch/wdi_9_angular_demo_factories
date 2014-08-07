@@ -12,7 +12,16 @@
     // from the customersFactory
     function init(){
       // Init the customers from the factory
-      $scope.customers = customersFactory.getCustomers();
+      //$scope.customers = customersFactory.getCustomers();
+      customersFactory.getCustomers()
+      .success(function(customerData){
+        //Does something with the data returned by the API
+        $scope.customers = customerData;
+      })
+      .error(function(data, status, headers, config){
+        console.log("Error getting customers from the remote api");
+        alert("Error getting customers from the remote api");
+      });
     }
 
     // 4. Initialize the controller.
